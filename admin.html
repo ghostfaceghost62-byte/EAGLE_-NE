@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAGLE ONE | Command Center</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script>
+    const _adminUser = JSON.parse(localStorage.getItem('eagle_active_user') || 'null');
+    if (!_adminUser || _adminUser.role !== 'admin') window.location.replace('index.html');
+</script>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            EAGLE <span class="accent-text">CMD</span>
+            <div class="sidebar-version">COMMAND CENTER v2.0</div>
+        </div>
+
+        <nav class="nav-links">
+            <div class="nav-category">INVENTORY</div>
+            <a onclick="switchAdminTab(event,'products')" class="active">📦 Products</a>
+            <a onclick="switchAdminTab(event,'collections')">💎 Collections</a>
+
+            <div class="nav-category">OPERATIONS</div>
+            <a onclick="switchAdminTab(event,'orders')">📑 Orders</a>
+            <a onclick="switchAdminTab(event,'users')">👥 Operators</a>
+
+            <div class="nav-category">CONTENT</div>
+            <a onclick="switchAdminTab(event,'faq')">❓ FAQ</a>
+            <a onclick="switchAdminTab(event,'blog')">✍️ Blog</a>
+            <a onclick="switchAdminTab(event,'support')">🛠️ Support</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-admin-info">
+                <div class="admin-avatar" id="admin-avatar">A</div>
+                <div class="admin-info-text">
+                    <strong id="admin-name">ADMIN</strong>
+                    <small>COMMAND ACCESS</small>
+                </div>
+            </div>
+            <a href="shop.html" class="btn-outline btn-full btn-sm" style="display:block; text-align:center; margin-bottom: 8px; text-decoration:none;">
+                🛒 VIEW STORE
+            </a>
+            <button onclick="logout()" class="btn-danger btn-full">SEVER UPLINK</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- PRODUCTS -->
+        <section id="view-products">
+            <p class="label">INVENTORY CONTROL</p>
+            <h2 class="page-title">MANAGE <span class="accent-text">PRODUCTS</span></h2>
+
+            <div class="admin-card">
+                <h3 style="font-size: 1rem; margin-bottom: 1.2rem;" id="product-form-title">ADD NEW PRODUCT</h3>
+                <form id="admin-product-form" class="admin-form-grid"
+                      onsubmit="event.preventDefault(); saveProduct();">
+                    <input id="p-id" type="hidden">
+                    <input id="p-name" type="text" placeholder="Product Name" required>
+                    <input id="p-price" type="number" step="1" min="0" placeholder="Price (₱)" required>
+                    <input id="p-stock" type="number" min="0" placeholder="Stock Units" required>
+                    <input id="p-img" type="url" placeholder="Image URL (optional)">
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button type="submit" class="btn-primary" id="form-submit-btn">ADD PRODUCT</button>
+                        <button type="button" class="btn-outline btn-sm" onclick="cancelEdit()" title="Cancel edit">✕</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stats overview row -->
+            <div id="admin-stats" class="stats-grid" style="margin-bottom: 1.5rem;"></div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- COLLECTIONS -->
+        <section id="view-collections" class="hidden">
+            <p class="label">PRODUCT GROUPS</p>
+            <h2 class="page-title">MANAGE <span class="accent-text">COLLECTIONS</span></h2>
+            <div class="admin-card">
+                <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1.2rem;">Assign items or descriptions to special collection groups shown in the store.</p>
+                <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end;">
+                    <input id="col-name" type="text" placeholder="Item / Bundle Name">
+                    <select id="col-type">
+                        <option value="offers">Bundle Offer</option>
+                        <option value="new-arrivals">New Arrival</option>
+                        <option value="best-sellers">Best Seller</option>
+                    </select>
+                    <button onclick="addToCollection()" class="btn-primary">ASSIGN</button>
+                </div>
+            </div>
+            <div id="collections-display" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;"></div>
+        </section>
+
+        <!-- ORDERS -->
+        <section id="view-orders" class="hidden">
+            <p class="label">DEPLOYMENT LOGS</p>
+            <h2 class="page-title">ALL <span class="accent-text">ORDERS</span></h2>
+            <div id="orders-list" class="orders-grid"></div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="view-faq" class="hidden">
+            <p class="label">OPERATOR INTEL</p>
+            <h2 class="page-title">FAQ <span class="accent-text">MANAGEMENT</span></h2>
+            <div class="admin-card">
+                <div style="display:grid; grid-template-columns: 1fr 2fr auto; gap:12px; align-items:end;">
+                    <input id="faq-question" type="text" placeholder="Question">
+                    <input id="faq-answer" type="text" placeholder="Answer">
+                    <button onclick="saveFAQ()" class="btn-primary">ADD ENTRY</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Answer</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="faq-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- BLOG -->
+        <section id="view-blog" class="hidden">
+            <p class="label">CONTENT CONTROL</p>
+            <h2 class="page-title">BLOG <span class="accent-text">POSTS</span></h2>
+            <div class="admin-card">
+                <div style="display:grid; gap:12px;">
+                    <input id="blog-title" type="text" placeholder="Post Title">
+                    <textarea id="blog-content" placeholder="Post content..." rows="5"></textarea>
+                    <button onclick="saveBlogPost()" class="btn-primary" style="width:fit-content;">PUBLISH POST</button>
+                </div>
+            </div>
+            <div id="blog-admin-list" class="orders-grid"></div>
+        </section>
+
+        <!-- SUPPORT -->
+        <section id="view-support" class="hidden">
+            <p class="label">TECH SUPPORT</p>
+            <h2 class="page-title">SUPPORT <span class="accent-text">CENTER</span></h2>
+            <div class="admin-card">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                    <span style="color:var(--success); font-size:1.2rem;">●</span>
+                    <strong>All systems operational</strong>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem;">No pending tickets from operators at this time.</p>
+                <hr style="border:0; border-top:1px solid var(--border); margin:1.5rem 0;">
+                <div id="support-tickets">
+                    <p class="text-muted" style="font-size:0.85rem;">Ticket submissions will appear here.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- USERS -->
+        <section id="view-users" class="hidden">
+            <p class="label">ACCESS CONTROL</p>
+            <h2 class="page-title">ACTIVE <span class="accent-text">OPERATORS</span></h2>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Operator ID</th>
+                            <th>Clearance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="system.js"></script>
+<script>
+    // Set admin name
+    const _u = JSON.parse(localStorage.getItem('eagle_active_user') || '{}');
+    if (_u?.username) {
+        document.getElementById('admin-name').innerText = _u.username.toUpperCase();
+        document.getElementById('admin-avatar').innerText = _u.username.charAt(0).toUpperCase();
+    }
+
+    window.onload = () => {
+        renderAdmin();
+        renderFAQAdmin();
+        renderBlogAdmin();
+    };
+</script>
+
+</body>
+</html>

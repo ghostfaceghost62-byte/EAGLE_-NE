@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAGLE ONE | Secure Uplink</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="logo">EAGLE <span class="accent-text">ONE</span></h1>
+            <p class="auth-subtitle">— SECURE UPLINK REQUIRED —</p>
+        </div>
+
+        <form onsubmit="handleAuth(event)" autocomplete="off">
+            <div class="input-group">
+                <span class="input-icon">⚡</span>
+                <input type="text" id="username" placeholder="User Name" required autocomplete="username" spellcheck="false">
+            </div>
+            <div class="input-group">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+            </div>
+            <div style="margin-top: 1.2rem;">
+                <button type="submit" class="btn-primary btn-full">Log In</button>
+            </div>
+        </form>
+
+        <div id="auth-error" class="error-msg hidden" role="alert"></div>
+
+        <div class="auth-footer">
+            <span style="color: var(--text-muted); font-size: 0.8rem;">New operator?</span>
+            <a href="registration.html" class="auth-link" style="margin-left: 8px;">Request Access →</a>
+        </div>
+
+        <div style="margin-top: 1.5rem; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border);">
+            <p style="font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 2px; color: var(--text-subtle); text-align: center; line-height: 2;">
+                DEFAULT: username: admin / pass: 1234 
+            </p>
+        </div>
+    </div>
+</main>
+
+<script src="auth.js"></script>
+</body>
+</html>

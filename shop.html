@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAGLE ONE | Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script>
+    if (!localStorage.getItem('eagle_active_user')) {
+        window.location.replace('index.html');
+    }
+</script>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">EAGLE <span class="accent-text">ONE</span></div>
+    <div class="nav-actions">
+        <div class="nav-user-badge" id="user-badge">
+            <div class="user-dot"></div>
+            <span id="nav-username">OPERATOR</span>
+        </div>
+        <button class="cart-btn" onclick="toggleCart()">
+            ⚙ GEAR BAG
+            <span id="cart-count">0</span>
+        </button>
+        <button onclick="logout()" class="btn-danger" style="padding: 0.6rem 1.2rem; font-size: 0.78rem;">LOGOUT</button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+    <p class="hero-eyebrow">EAGLE ONE PERFORMANCE GEAR</p>
+    <h1>APEX<br><span class="accent-text">PERFORMANCE</span></h1>
+    <p class="hero-sub">Elite gear for elite operators. Built for speed, precision, and durability.</p>
+    <div class="hero-line"></div>
+</header>
+
+<!-- SEARCH -->
+<div class="search-container">
+    <span class="search-icon">🔍</span>
+    <input id="product-search" class="search-bar" onkeyup="filterStore()"
+           placeholder="SEARCH GEAR..." autocomplete="off" spellcheck="false">
+</div>
+
+<!-- CATEGORY TABS -->
+<nav class="category-bar">
+    <a href="#" onclick="showTab(event,'home')" class="active">Home</a>
+    <a href="#" onclick="showTab(event,'about')">About</a>
+    <a href="#" onclick="showTab(event,'products')">Products</a>
+    <a href="#" onclick="showTab(event,'offers')">Offers</a>
+    <a href="#" onclick="showTab(event,'new-arrivals')">New Arrivals</a>
+    <a href="#" onclick="showTab(event,'best-sellers')">Best Sellers</a>
+    <a href="#" onclick="showTab(event,'contact')">Contact</a>
+    <a href="#" onclick="showTab(event,'faq')">FAQ</a>
+    <a href="#" onclick="showTab(event,'blog')">Blog</a>
+    <a href="#" onclick="showTab(event,'support')">Support</a>
+</nav>
+
+<!-- TAB CONTENT -->
+<div id="tab-content">
+
+    <!-- HOME -->
+    <div id="home-tab" class="tab-section">
+        <div style="max-width: 800px;">
+            <p class="label" style="margin-bottom: 1rem;">WELCOME, OPERATOR</p>
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">GEAR UP.<br><span class="accent-text">MOVE FAST.</span></h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; max-width: 550px; margin-bottom: 2rem;">
+                Eagle One delivers precision-engineered performance gear for riders who demand the best.
+                From helmets to exhaust systems — if it makes you faster, we carry it.
+            </p>
+            <button class="btn-primary" onclick="showTabByName('products')" style="width: auto;">
+                BROWSE PRODUCTS →
+            </button>
+        </div>
+
+        <!-- Featured products strip -->
+        <div style="margin-top: 3rem;">
+            <p class="label" style="margin-bottom: 1.2rem;">FEATURED GEAR</p>
+            <div id="featured-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:16px;"></div>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div id="about-tab" class="tab-section hidden">
+        <div class="about-section">
+            <p class="label" style="margin-bottom: 1rem;">WHO WE ARE</p>
+            <h2>ABOUT <span class="accent-text">EAGLE ONE</span></h2>
+            <p>Eagle One is a modern performance gear store offering high-quality products designed for speed, durability, and precision. Every item in our inventory is sourced and tested to meet the demands of serious riders and racers.</p>
+            <p>Founded by riders, for riders — we understand what it takes to perform at the highest level. Whether you're hitting the track or the trail, we have the gear to get you there.</p>
+            <div class="about-features">
+                <div class="about-feature">
+                    <span class="icon">🏎️</span>
+                    <h4>Race-Grade Quality</h4>
+                    <p>All gear meets international safety and performance standards.</p>
+                </div>
+                <div class="about-feature">
+                    <span class="icon">🛡️</span>
+                    <h4>Operator Safety</h4>
+                    <p>Protection is non-negotiable. Every product is rigorously tested.</p>
+                </div>
+                <div class="about-feature">
+                    <span class="icon">⚡</span>
+                    <h4>Fast Delivery</h4>
+                    <p>Orders confirmed and deployed within 24–48 hours.</p>
+                </div>
+                <div class="about-feature">
+                    <span class="icon">🔧</span>
+                    <h4>Expert Support</h4>
+                    <p>Our team is ready to help you find the perfect gear.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="products-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.5rem;">ALL INVENTORY</p>
+        <div id="store-grid" class="store-grid"></div>
+    </div>
+
+    <!-- OFFERS -->
+    <div id="offers-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">CURRENT BUNDLES</p>
+        <h2 style="margin-bottom: 1.5rem;">ACTIVE <span class="accent-text">OFFERS</span></h2>
+        <div id="offers-content">
+            <p style="color: var(--text-muted);">No active offers at this time. Check back soon.</p>
+        </div>
+    </div>
+
+    <!-- NEW ARRIVALS -->
+    <div id="new-arrivals-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">JUST LANDED</p>
+        <h2 style="margin-bottom: 1.5rem;">NEW <span class="accent-text">ARRIVALS</span></h2>
+        <div id="new-arrivals-content">
+            <p style="color: var(--text-muted);">New arrivals will appear here as they land.</p>
+        </div>
+    </div>
+
+    <!-- BEST SELLERS -->
+    <div id="best-sellers-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">TOP PERFORMERS</p>
+        <h2 style="margin-bottom: 1.5rem;">BEST <span class="accent-text">SELLERS</span></h2>
+        <div id="best-sellers-content">
+            <p style="color: var(--text-muted);">Top selling gear will appear here.</p>
+        </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="contact-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">GET IN TOUCH</p>
+        <h2 style="margin-bottom: 1.5rem;">CONTACT <span class="accent-text">US</span></h2>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <p>Have questions about our gear or your order? Reach out through any channel below.</p>
+                <div class="contact-item">
+                    <span>✉</span>
+                    <span>support@eagleone.ph</span>
+                </div>
+                <div class="contact-item">
+                    <span>📞</span>
+                    <span>+63 900 000 0000</span>
+                </div>
+                <div class="contact-item">
+                    <span>📍</span>
+                    <span>Metro Manila, Philippines</span>
+                </div>
+                <div class="contact-item">
+                    <span>🕐</span>
+                    <span>Mon–Sat, 9AM–6PM</span>
+                </div>
+            </div>
+            <div>
+                <div class="admin-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 1.2rem;">SEND A MESSAGE</h3>
+                    <input type="text" placeholder="Your Name" style="margin-bottom: 8px;">
+                    <input type="email" placeholder="Email Address" style="margin-bottom: 8px;">
+                    <textarea placeholder="Your message..." rows="4" style="margin-bottom: 12px;"></textarea>
+                    <button class="btn-primary btn-full" onclick="showToast('Message sent! We will reply shortly.', 'success')">SEND MESSAGE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">INTEL BRIEFING</p>
+        <h2 style="margin-bottom: 1.5rem;">FREQUENTLY ASKED <span class="accent-text">QUESTIONS</span></h2>
+        <div id="faq-list" style="max-width: 700px;"></div>
+    </div>
+
+    <!-- BLOG -->
+    <div id="blog-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">FIELD REPORTS</p>
+        <h2 style="margin-bottom: 1.5rem;">LATEST <span class="accent-text">ARTICLES</span></h2>
+        <div id="blog-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:16px; max-width:1000px;"></div>
+    </div>
+
+    <!-- SUPPORT -->
+    <div id="support-tab" class="tab-section hidden">
+        <p class="label" style="margin-bottom: 1.2rem;">TECH SUPPORT</p>
+        <h2 style="margin-bottom: 1.5rem;">OPERATOR <span class="accent-text">SUPPORT</span></h2>
+        <div style="max-width: 600px;">
+            <div class="admin-card" style="margin-bottom: 1.5rem;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                    <span style="color: var(--success); font-size: 1.2rem;">●</span>
+                    <strong>System Status: <span class="accent-text">OPERATIONAL</span></strong>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.88rem;">All systems running normally. Average response time: &lt; 24 hours.</p>
+            </div>
+            <div class="admin-card">
+                <h3 style="font-size: 1rem; margin-bottom: 1.2rem;">SUBMIT A TICKET</h3>
+                <input type="text" placeholder="Subject" style="margin-bottom: 8px;">
+                <textarea placeholder="Describe your issue..." rows="4" style="margin-bottom: 12px;"></textarea>
+                <button class="btn-primary btn-full" onclick="showToast('Ticket submitted! Our team will respond within 24 hours.', 'success')">SUBMIT TICKET</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CART OVERLAY -->
+<div id="cart-overlay" class="cart-overlay" onclick="toggleCart()"></div>
+
+<!-- CART SIDEBAR -->
+<div id="cart-sidebar" class="cart-sidebar">
+    <div class="cart-header-row">
+        <h2>⚙ GEAR BAG</h2>
+        <button onclick="toggleCart()" class="btn-outline btn-sm">✕ CLOSE</button>
+    </div>
+    <div id="cart-items" class="cart-items"></div>
+    <div class="cart-footer-section">
+        <div class="cart-total-row">
+            <span>TOTAL COST</span>
+            <span id="cart-total">₱0</span>
+        </div>
+        <button class="btn-primary btn-full" onclick="goCheckout()">CONFIRM & CHECKOUT →</button>
+        <button class="btn-outline btn-full" onclick="toggleCart()" style="font-size: 0.78rem;">CONTINUE BROWSING</button>
+    </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<script src="system.js"></script>
+<script>
+    // Set navbar username
+    const _user = JSON.parse(localStorage.getItem('eagle_active_user') || '{}');
+    if (_user?.username) {
+        document.getElementById('nav-username').innerText = _user.username.toUpperCase();
+    }
+
+    function showTab(event, tab) {
+        event.preventDefault();
+        showTabByName(tab);
+        document.querySelectorAll('.category-bar a').forEach(a => a.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+
+    function showTabByName(tab) {
+        document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
+        const el = document.getElementById(tab + '-tab');
+        if (el) el.classList.remove('hidden');
+
+        if (tab === 'products') renderStore();
+        if (tab === 'home') renderFeatured();
+        if (tab === 'faq') renderFAQShop();
+        if (tab === 'blog') renderBlogShop();
+        if (tab === 'offers') renderCollectionsShop('offers', 'offers-content');
+        if (tab === 'new-arrivals') renderCollectionsShop('newArrivals', 'new-arrivals-content');
+        if (tab === 'best-sellers') renderCollectionsShop('bestSellers', 'best-sellers-content');
+    }
+
+    // Render 4 featured products on home tab
+    function renderFeatured() {
+        const grid = document.getElementById('featured-grid');
+        if (!grid) return;
+        const featured = products.slice(0, 4);
+        grid.innerHTML = featured.map(p => `
+        <div class="product-card" onclick="showTabByName('products')"
+             style="cursor:pointer;" title="View all products">
+            <div class="product-img-wrap" style="height:160px;">
+                <img src="${p.image}" class="product-img" alt="${p.name}"
+                     onerror="this.src='https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80'">
+            </div>
+            <div class="product-info">
+                <h3 style="font-size:0.9rem;">${p.name}</h3>
+                <span class="price" style="font-size:1.1rem;">₱${p.price.toLocaleString()}</span>
+                <button class="btn-primary add-btn" style="font-size:0.75rem; padding:0.6rem;"
+                    onclick="event.stopPropagation(); addToCart(${p.id})"
+                    ${p.stock <= 0 ? 'disabled' : ''}>
+                    ${p.stock <= 0 ? 'OUT OF STOCK' : '+ ADD TO GEAR'}
+                </button>
+            </div>
+        </div>`).join('');
+    }
+
+    // FAQ in shop
+    function renderFAQShop() {
+        const div = document.getElementById('faq-list');
+        if (!div) return;
+        const faq = JSON.parse(localStorage.getItem('eagle_faq')) || [];
+        if (faq.length === 0) {
+            div.innerHTML = `<p style="color:var(--text-muted);">No FAQ entries yet.</p>`;
+            return;
+        }
+        div.innerHTML = faq.map((f, i) => `
+        <div class="faq-item" id="faq-${i}">
+            <div class="faq-question" onclick="toggleFAQ(${i})">
+                <span>${f.question}</span>
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">${f.answer}</div>
+        </div>`).join('');
+    }
+
+    function toggleFAQ(i) {
+        const item = document.getElementById('faq-' + i);
+        item.classList.toggle('open');
+    }
+
+    // Blog in shop
+    function renderBlogShop() {
+        const div = document.getElementById('blog-list');
+        if (!div) return;
+        const blog = JSON.parse(localStorage.getItem('eagle_blog')) || [];
+        if (blog.length === 0) {
+            div.innerHTML = `<p style="color:var(--text-muted);">No blog posts published yet.</p>`;
+            return;
+        }
+        div.innerHTML = blog.slice().reverse().map(b => `
+        <div class="blog-card">
+            <div class="blog-card-header">
+                <h3>${b.title}</h3>
+                <div class="blog-card-date">${b.date}</div>
+            </div>
+            <div class="blog-card-body">${b.content.substring(0, 220)}${b.content.length > 220 ? '...' : ''}</div>
+        </div>`).join('');
+    }
+
+    // Collections in shop tabs
+    function renderCollectionsShop(key, containerId) {
+        const div = document.getElementById(containerId);
+        if (!div) return;
+        const cols = JSON.parse(localStorage.getItem('eagle_collections')) || { offers: [], newArrivals: [], bestSellers: [] };
+        const items = cols[key] || [];
+        if (items.length === 0) {
+            div.innerHTML = `<p style="color:var(--text-muted);">Nothing here yet. Check back soon!</p>`;
+            return;
+        }
+        div.innerHTML = `<ul style="list-style:none; display:flex; flex-direction:column; gap:10px; max-width:600px;">
+            ${items.map(item => `
+            <li style="padding:1rem 1.2rem; background:var(--bg-card); border:1px solid var(--border);
+                       border-radius:var(--radius); display:flex; align-items:center; gap:12px;">
+                <span style="color:var(--accent);">▶</span>
+                <span>${item}</span>
+            </li>`).join('')}
+        </ul>`;
+    }
+
+    // Init home tab
+    renderFeatured();
+</script>
+
+</body>
+</html>
